@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+import requests
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,6 +23,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-c4^@)(+z22o(t-upy_=%zp1ya&44b*y6b9rhlehx=rrh%2i$9='
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+CLIENT_ID = "c30a798e-3480-495c-9543-40ba005c90bd"
+CLIENT_SECRET = "Al-7Q~XEqY~D2KSbFPoZxO2KJLekKYyOYNkuK"
+TENANT_ID = "296ed9d2-301b-4f62-8624-0e3e9947b4f6"
+
+
+# Add ip(s) to ALLOWED HOSTS django setting
+ALLOWED_HOSTS = ['localhost']
+
+# GET Container Ip and add to allowed hosts
+try:
+    METADATA_URI = os.environ['ECS_CONTAINER_METADATA_URI_V4']
+    container_metadata = requests.get(METADATA_URI).json()
+    ALLOWED_HOSTS.append(container_metadata['Networks'][0]['IPv4Addresses'][0])
+
+except KeyError:
+    print("ECS_CONTAINER_METADATA_URI_V4 does not exist")
+
+print('ALLOWED_HOSTS', ALLOWED_HOSTS)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
